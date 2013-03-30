@@ -1,11 +1,8 @@
 package com.cedexis.api.v2.sampleclient
-
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  * The uri, client_id, or client_secret must be set with command line args:
  * <ul>
@@ -16,7 +13,7 @@ import org.slf4j.LoggerFactory
  *
  * @author jon
  */
-@Ignore('ignoring until CEDEX-2080 is ready')
+//@Ignore('ignoring until CEDEX-2080 is ready')
 class CedexisApiTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(CedexisApiTest)
