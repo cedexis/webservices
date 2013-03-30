@@ -1,0 +1,67 @@
+description = 'Cedexis Web Services'
+
+subprojects {
+    apply plugin: 'groovy'
+    apply plugin: 'codenarc'
+
+    sourceCompatibility = 1.6
+    group = 'com.cedexis'
+    version = 'v2013.03.29'
+
+    repositories {
+        mavenCentral()
+    }
+
+    configurations {
+        // exclude commons-logging, log4j, and j.u.logging - we use slf4j and logback
+        // http://spring-java-ee.posterous.com/gradle-build-for-spring-framework-and-slf4j-w
+        all*.exclude group: 'commons-logging'
+        all*.exclude group: 'log4j'
+
+        // exclude aspectj - we do not use it
+        all*.exclude group: 'org.aspectj'
+    }
+
+    dependencies {
+        compile 'org.slf4j:slf4j-api:1.7.2',
+                'org.codehaus.groovy:groovy-all:2.1.1'
+
+        runtime 'ch.qos.logback:logback-classic:1.0.9', // we use logback
+                'org.slf4j:jcl-over-slf4j:1.7.2',       // and the commons-logging bridge
+                'org.slf4j:log4j-over-slf4j:1.7.2'      // and the log4j bridge
+
+        testCompile 'junit:junit:4.8.2',
+                    'org.mockito:mockito-all:1.8.5'
+    }
+
+    jar {
+        manifest {
+            attributes 'Implementation-Title': project.name, 'Implementation-Version': version
+        }
+    }
+
+    // ignore test failures (useful in a CI environment)?
+    // ignore failures like so:
+    // gradlew -PignoreTestFailures=true test
+    if (project.hasProperty('ignoreTestFailures') && ignoreTestFailures == 'true') {
+        afterEvaluate { project ->
+            if (project.tasks.test) {
+                // Cause the build to continue even if there are test failures.
+                // Use with caution - the build will succeed even if there are test failures.
+                // Only by checking the test reports will it be obvious the build failed
+                project.tasks.test.ignoreFailures = true
+            }
+        }
+    }
+
+    codenarc {
+        configFile = file("$rootDir/config/codenarc/codenarc.groovy")
+        ignoreFailures = true
+    }
+
+}
+
+task wrapper(type: Wrapper) {
+    description = 'Regnerates the Gradle wrapper script'
+    gradleVersion = '1.5'
+}
