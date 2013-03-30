@@ -1,0 +1,32 @@
+apply plugin: 'maven-publish'
+
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(publish)) {
+        def mvnRepoPath = System.properties['mvnRepoPath']
+        def mvnReleaseType = System.properties['mvnReleaseType']
+
+        if (!mvnRepoPath) {
+            throw new IllegalArgumentException("-DmvnRepoPath=/path/to/githubMvnRepo is required when publishing")
+        }
+        if (!mvnReleaseType || !(mvnReleaseType in ['snapshot', 'release'])) {
+            throw new IllegalArgumentException("-DmvnReleaseType=[snapshot|release] is required when publishing")
+        }
+
+        println "publishing [$version] [$mvnReleaseType] to [$mvnRepoPath]"
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "file://${System.properties['mvnRepoPath']}/${System.properties['mvnReleaseType']}s"
+        }
+    }
+}
+
