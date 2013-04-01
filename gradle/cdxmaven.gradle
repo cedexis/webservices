@@ -1,19 +1,4 @@
 /**
- * Cedexis Maven repo settings.
- *
- * @author jon
- */
-ext {
-    cedexisRepoBase = 'http://maven.cedexis.com/nexus/content/repositories/cedexis'
-    cedexisRepos = [
-            public: [
-                    snapshots: "${cedexisRepoBase}-snapshots-public",
-                    releases: "${cedexisRepoBase}-releases-public"
-            ]
-    ]
-}
-
-/**
  * Configure Maven publishing for all projecs that have the "maven" plugin applied...
  */
 plugins.withType(MavenPlugin) {
@@ -28,11 +13,16 @@ plugins.withType(MavenPlugin) {
     uploadArchives {
         repositories {
             mavenDeployer {
-                repository(url: cedexisRepos.public.releases) {
-                    authentication(userName: cedexisMvnUser, password: cedexisMvnPassword)
+
+                //
+                // The cedexisMaven* variables come from your ~/.gradle/gradle.properties
+                //
+
+                repository(url: cedexisMavenPublicReleases) {
+                    authentication(userName: cedexisMavenUser, password: cedexisMavenPassword)
                 }
-                snapshotRepository(url: cedexisRepos.public.snapshots) {
-                    authentication(userName: cedexisMvnUser, password: cedexisMvnPassword)
+                snapshotRepository(url: cedexisMavenPublicSnapshots) {
+                    authentication(userName: cedexisMavenUser, password: cedexisMavenPassword)
                 }
             }
         }
