@@ -1,0 +1,54 @@
+/**
+ * Cedexis Maven repo settings.
+ *
+ * @author jon
+ */
+ext {
+    cedexisRepoBase = 'http://maven.cedexis.com/nexus/content/repositories/cedexis'
+    cedexisRepos = [
+            public: [
+                    snapshots: "${cedexisRepoBase}-snapshots-public",
+                    releases: "${cedexisRepoBase}-releases-public"
+            ]
+    ]
+}
+
+/**
+ * Configure Maven publishing for all projecs that have the "maven" plugin applied...
+ */
+plugins.withType(MavenPlugin) {
+
+    /**
+     * Configures the remote publishing repo.  Uses the "old" Gradle Maven plugin
+     * (http://www.gradle.org/docs/current/userguide/maven_plugin.html).
+     *
+     * Publish to your local repo: gradle install
+     * Publish to remote repo: see scripts/publish.sh
+     */
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: cedexisRepos.public.releases) {
+                    authentication(userName: cedexisMvnUser, password: cedexisMvnPassword)
+                }
+                snapshotRepository(url: cedexisRepos.public.snapshots) {
+                    authentication(userName: cedexisMvnUser, password: cedexisMvnPassword)
+                }
+            }
+        }
+    }
+
+    // PUBLISHES SRC AND JAVADOC TO MAVEN
+    task sourceJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+    task javadocJar(type: Jar, dependsOn: [javadoc]) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+    artifacts {
+        archives sourceJar
+        archives javadocJar
+    }
+}

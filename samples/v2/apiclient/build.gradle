@@ -3,7 +3,8 @@ description = 'Cedexis API Client'
 apply plugin: 'application'
 mainClassName = 'com.cedexis.api.v2.sampleclient.cli.Main'
 
-apply from: 'publish.gradle'
+apply plugin: 'maven'
+apply from: "$rootDir/gradle/cdxmaven.gradle"
 
 dependencies {
     compile('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
@@ -17,4 +18,3 @@ tasks.withType(Test) {
     // allows passing properties from the Gradle command line into the JVM that runs the tests
     systemProperties = System.getProperties()
 }
-
