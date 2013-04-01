@@ -1,22 +1,20 @@
 /**
- * Cedexis Maven repo settings.
+ * Configure Maven publishing for all projecs that have the "maven" plugin applied...
  *
  * @author jon
  */
-ext {
-    cedexisRepoBase = 'http://maven.cedexis.com/nexus/content/repositories/cedexis'
-    cedexisRepos = [
+plugins.withType(MavenPlugin) {
+
+    /**
+     * Cedexis Maven repo settings.
+     */
+    def cedexisRepoBase = 'http://maven.cedexis.com/nexus/content/repositories/cedexis'
+    def cedexisRepos = [
             public: [
                     snapshots: "${cedexisRepoBase}-snapshots-public",
                     releases: "${cedexisRepoBase}-releases-public"
             ]
     ]
-}
-
-/**
- * Configure Maven publishing for all projecs that have the "maven" plugin applied...
- */
-plugins.withType(MavenPlugin) {
 
     /**
      * Configures the remote publishing repo.  Uses the "old" Gradle Maven plugin
