@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory
  *
  * @author jon
  */
-//@Ignore('ignoring until CEDEX-2080 is ready')
 class CedexisApiTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(CedexisApiTest)
