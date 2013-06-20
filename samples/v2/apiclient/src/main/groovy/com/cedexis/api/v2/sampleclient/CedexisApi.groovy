@@ -79,7 +79,8 @@ class CedexisApi {
         json.version
     }
 
-    def listApplications() { get 'applications.json' }
+    def listDnsApplications() { get 'applications/dns.json' }
+    def listHttpApplications() { get 'applications/http.json' }
     def listContinents() { get 'continents.json' }
     def listSubcontinents() { get 'subcontinents.json' }
     def listCountries() { get 'countries.json' }

@@ -63,12 +63,20 @@ final class Commands {
         }
     }
 
-    static class ListApplicationsCommand extends AbstractCommand {
+    static class ListDnsApplicationsCommand extends AbstractCommand {
         @Override
-        String name() { 'List Applications' }
+        String name() { 'List DNS Applications' }
 
         @Override
-        void doProcess(CedexisApi api) { api.listApplications().each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.listDnsApplications().each { LOG.info "$it" } }
+    }
+
+    static class ListHttpApplicationsCommand extends AbstractCommand {
+        @Override
+        String name() { 'List HTTP Applications' }
+
+        @Override
+        void doProcess(CedexisApi api) { api.listHttpApplications().each { LOG.info "$it" } }
     }
 
     static class ListContinentsCommand extends AbstractCommand {

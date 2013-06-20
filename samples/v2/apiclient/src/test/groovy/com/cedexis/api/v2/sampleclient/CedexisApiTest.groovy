@@ -1,5 +1,6 @@
 package com.cedexis.api.v2.sampleclient
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -51,10 +52,10 @@ class CedexisApiTest {
     }
 
     @Test
-    void testListApplications() {
-        def applications = api.listApplications()
+    void testListDnsApplications() {
+        def applications = api.listDnsApplications()
 
-        LOG.debug "applications: $applications.size"
+        LOG.debug "dns applications: $applications.size"
         applications.each { LOG.debug "$it" }
 
         assert !applications.isEmpty()
@@ -62,6 +63,21 @@ class CedexisApiTest {
         def application = applications[0]
         assert Integer.valueOf(application.id) != null
         assert application.name != null
+    }
+
+    @Test
+    void testListHttpApplications() {
+        def applications = api.listHttpApplications()
+
+        LOG.debug "http applications: $applications.size"
+        applications.each { LOG.debug "$it" }
+
+        assert applications.isEmpty()
+//        assert !applications.isEmpty()
+//
+//        def application = applications[0]
+//        assert Integer.valueOf(application.id) != null
+//        assert application.name != null
     }
 
     @Test
@@ -183,13 +199,14 @@ class CedexisApiTest {
 
         assert userAgents.size() > 150
 
-        assert userAgents.find { it.agentName == 'Internet Explorer' }
-        assert userAgents.find { it.agentName == 'Chrome' }
-        assert userAgents.find { it.os == 'Windows' }
-        assert userAgents.find { it.majorVersion == '22' }
+        assert userAgents.find { it.browserFamily.name == 'IE' }
+        assert userAgents.find { it.browserFamily.name == 'Chrome' }
+        assert userAgents.find { it.os.name == 'Windows' }
+        assert userAgents.find { it.majorVersion.name == '22' }
     }
 
     @Test
+    @Ignore("user agent searching is not currently supported")
     void testListUserAgentsWithSearch() {
         def userAgents = api.listUserAgents('chrome')
 
@@ -199,7 +216,7 @@ class CedexisApiTest {
         assert 40 < userAgents.size()
         assert 60 > userAgents.size()
 
-        assert !userAgents.find { it.agentName == 'Internet Explorer' }
+        assert !userAgents.find { it.agentName == 'IE' }
         assert userAgents.find { it.agentName == 'Chrome' }
         assert userAgents.find { it.os == 'Windows' }
         assert userAgents.find { it.majorVersion == '22' }
@@ -213,7 +230,7 @@ class CedexisApiTest {
         LOG.debug "statistics: $statistics.size"
         statistics.each { LOG.debug "$it" }
 
-        assert 8 == statistics.size()
+        assert 13 == statistics.size()
 
         def measurements = statistics.find { it.name == 'measurements' }
         assert 'measurements' == measurements.name
@@ -264,7 +281,7 @@ class CedexisApiTest {
         def referrers = api.listReferrers()
         def preAddReferrerCount = referrers.size()
 
-        def url = 'http://www.test.com/' + UUID.randomUUID().toString()
+        def url = 'www.test.com/' + UUID.randomUUID().toString()
         def addedReferrer = api.addReferrer url
 
         LOG.debug "added referrer: $addedReferrer"
@@ -277,7 +294,7 @@ class CedexisApiTest {
         referrers.each { LOG.debug "$it" }
 
         assert 1 + preAddReferrerCount == referrers.size()
-        assert referrers.find { it.url.startsWith('http://www.test.com/') }
+        assert referrers.find { it.url.startsWith('www.test.com/') }
 
         assert url == addedReferrer.url
         assert addedReferrer.id
