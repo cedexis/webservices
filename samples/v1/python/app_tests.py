@@ -16,8 +16,9 @@ fields = [("displayName","web services test"),
 files = [("data", 
          "ws_test.php", 
          """<?php
-function process_request($Cedexis) {
-    return "radar.cedexis.com,cotendo";
+class OpenmixApplication implements Lifecycle {
+    public function init($config) {}
+    public function service($request,$response,$utilities) {}
 }
 ?>""")]
 
