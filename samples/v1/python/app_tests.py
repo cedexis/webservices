@@ -1,5 +1,5 @@
-#!/usr/bin/python
-from OAuthApiTest import OAuthApiTest 
+#!/usr/bin/env python
+from OAuthApiTest import OAuthApiTest, encode_multipart_formdata
 
 apiTest = OAuthApiTest("OAuth Application Tests")
 
