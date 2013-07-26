@@ -1,9 +1,7 @@
 package com.cedexis.api.v2.sampleclient.cli
-
 import com.cedexis.api.v2.sampleclient.CedexisApi
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  * The various commands that the sample app implements.
  *
@@ -58,8 +56,8 @@ final class Commands {
 
         @Override
         void doProcess(CedexisApi api) {
-            LOG.info 'Ping: ' + api.ping()
-            LOG.info 'API version: ' + api.apiVersion()
+            LOG.info 'Ping: ' + api.get('/v2/meta/system.json/ping').ping
+            LOG.info 'API version: ' + api.get('/v2/meta/system.json/version').version
         }
     }
 
@@ -68,7 +66,7 @@ final class Commands {
         String name() { 'List DNS Applications' }
 
         @Override
-        void doProcess(CedexisApi api) { api.listDnsApplications().each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/applications/dns.json').each { LOG.info "$it" } }
     }
 
     static class ListHttpApplicationsCommand extends AbstractCommand {
@@ -76,7 +74,7 @@ final class Commands {
         String name() { 'List HTTP Applications' }
 
         @Override
-        void doProcess(CedexisApi api) { api.listHttpApplications().each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/config/applications/http.json').each { LOG.info "$it" } }
     }
 
     static class ListContinentsCommand extends AbstractCommand {
@@ -84,7 +82,7 @@ final class Commands {
         String name() { 'List Continents' }
 
         @Override
-        void doProcess(CedexisApi api) { api.listContinents().each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/continents.json').each { LOG.info "$it" } }
     }
 
     static class ListSubcontinentsCommand extends AbstractCommand {
@@ -92,7 +90,7 @@ final class Commands {
         String name() { 'List Subcontinents' }
 
         @Override
-        void doProcess(CedexisApi api) { api.listSubcontinents().each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/subcontinents.json').each { LOG.info "$it" } }
     }
 
     static class ListCountriesCommand extends AbstractCommand {
@@ -100,7 +98,7 @@ final class Commands {
         String name() { 'List Countries' }
 
         @Override
-        void doProcess(CedexisApi api) { api.listCountries().each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/countries.json').each { LOG.info "$it" } }
     }
 
     static class ListCustomersCommand extends AbstractCommand {
@@ -108,7 +106,7 @@ final class Commands {
         String name() { 'List Customers' }
 
         @Override
-        void doProcess(CedexisApi api) { api.listCustomers().each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/customers.json').each { LOG.info "$it" } }
     }
 
     static class ListProbeTypesCommand extends AbstractCommand {
@@ -116,7 +114,7 @@ final class Commands {
         String name() { 'List Probe Types' }
 
         @Override
-        void doProcess(CedexisApi api) { api.listProbeTypes().each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/probetypes.json').each { LOG.info "$it" } }
     }
 
     static class SearchUserAgentsCommand extends AbstractCommand {
@@ -124,11 +122,7 @@ final class Commands {
         String name() { 'List User Agents' }
 
         @Override
-        void doProcess(CedexisApi api) {
-            def q = readStdIn 'Enter a search string'
-            def userAgents = api.listUserAgents(q)
-            userAgents.each { LOG.info "$it" }
-        }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/useragents.json').each { LOG.info "$it" } }
     }
 
     static class ListStatisticsCommand extends AbstractCommand {
@@ -136,21 +130,20 @@ final class Commands {
         String name() { 'List Statistics' }
 
         @Override
-        void doProcess(CedexisApi api) { api.listStatistics().each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/statistics.json').each { LOG.info "$it" } }
     }
 
-    static class SearchProvidersCommand extends AbstractCommand {
+    static class SearchPlatformsCommand extends AbstractCommand {
         @Override
-        String name() { 'Search Providers' }
+        String name() { 'Search Platforms' }
 
         @Override
         void doProcess(CedexisApi api) {
-            def q = readStdIn 'Enter COMMUNITY or PRIVATE'
-            LOG.info "Searcing for $q providers..."
-            api.listProviders(q).each { LOG.info "$it" }
-            def providers = api.listProviders(q)
-            providers.each { LOG.info "$it" }
-            LOG.info "$providers.size providers found"
+            def q = readStdIn 'Enter "community" or "private"'
+            LOG.info "Searching for $q platforms..."
+            def platforms = api.get("/v2/reporting/platforms.json/$q")
+            platforms.each { LOG.info "$it" }
+            LOG.info "$platforms.size platforms found"
         }
     }
 
@@ -162,29 +155,29 @@ final class Commands {
         void doProcess(CedexisApi api) {
             def q = readStdIn 'Enter network name'
             LOG.info "Searcing for networks named like [$q]..."
-            def networks = api.listNetworks(q)
+            def networks = api.get('/v2/reporting/networks.json', [q: q])
             networks.each { LOG.info "$it" }
             LOG.info "$networks.size networks found"
         }
     }
 
-    static class ListReferrersCommand extends AbstractCommand {
+    static class ListReferersCommand extends AbstractCommand {
         @Override
-        String name() { 'List Referrers' }
+        String name() { 'List Referers' }
 
         @Override
-        void doProcess(CedexisApi api) { api.listReferrers().each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/referers.json').each { LOG.info "$it" } }
     }
 
-    static class AddAReferrerCommand extends AbstractCommand {
+    static class AddARefererCommand extends AbstractCommand {
         @Override
-        String name() { 'Add Referrer' }
+        String name() { 'Add Referer' }
 
         @Override
         void doProcess(CedexisApi api) {
             def q = readStdIn 'Enter a URL'
-            LOG.info "Adding '[$q]' as a referrer..."
-            def added = api.addReferrer(q)
+            LOG.info "Adding '[$q]' as a referer..."
+            def added = api.post('/v2/config/referers.json', [url: q])
             LOG.info "Added $added"
         }
     }

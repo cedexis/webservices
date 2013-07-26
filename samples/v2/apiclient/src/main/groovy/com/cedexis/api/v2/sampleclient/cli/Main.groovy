@@ -39,10 +39,10 @@ class Main {
             new Commands.ListProbeTypesCommand(),
             new Commands.SearchUserAgentsCommand(),
             new Commands.ListStatisticsCommand(),
-            new Commands.SearchProvidersCommand(),
+            new Commands.SearchPlatformsCommand(),
             new Commands.SearchNetworksCommand(),
-            new Commands.ListReferrersCommand(),
-            new Commands.AddAReferrerCommand()
+            new Commands.ListReferersCommand(),
+            new Commands.AddARefererCommand()
     ]
 
     // -------------------------------------------------------------------------
