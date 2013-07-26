@@ -6,19 +6,19 @@ package com.cedexis.api.v2.sampleclient
  *
  * @author jon
  */
-class ApiErrorDescription {
+class ErrorDetail {
     private final String developerMessage
     private final String userMessage
     private final String field
     private final String errorCode
     private final String moreInfo
 
-    ApiErrorDescription(apiErrorDescription) {
-        this.developerMessage = apiErrorDescription.developerMessage
-        this.userMessage = apiErrorDescription.userMessage
-        this.field = apiErrorDescription.field
-        this.errorCode = apiErrorDescription.errorCode
-        this.moreInfo = apiErrorDescription.moreInfo
+    ErrorDetail(errorDetail) {
+        this.developerMessage = errorDetail.developerMessage
+        this.userMessage = errorDetail.userMessage
+        this.field = errorDetail.field
+        this.errorCode = errorDetail.errorCode
+        this.moreInfo = errorDetail.moreInfo
     }
 
     /** A plain English message that a developer can use to debug the problem. */

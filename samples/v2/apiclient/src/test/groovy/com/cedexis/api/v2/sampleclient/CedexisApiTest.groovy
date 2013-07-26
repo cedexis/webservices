@@ -1,8 +1,11 @@
 package com.cedexis.api.v2.sampleclient
+
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
 /**
  * The uri, client_id, or client_secret must be set with command line args:
  * <ul>
@@ -32,29 +35,51 @@ class CedexisApiTest {
 
     private static requireSystemProp(key) {
         def value = System.getProperty key
-        if (!value) { throw new IllegalArgumentException("$key is required (try '-D$key=...' on the command line") }
+        if (!value) {
+            throw new IllegalArgumentException("$key is required (try '-D$key=...' on the command line")
+        }
         value
+    }
+
+    private void printAll(results) {
+        LOG.debug results.size + ' results'
+        results.each { LOG.debug "$it" }
     }
 
     @Test
     void testPing() {
-        Date datetime = api.ping()
-        LOG.debug "datetime: $datetime"
-        assert datetime != null
+        def json = api.get '/v2/meta/system.json/ping'
+        LOG.debug "ping response: $json.ping"
+        assert 'pong' == json.ping
     }
 
     @Test
     void testApiVersion() {
-        def apiVersion = api.apiVersion()
+        def json = api.get '/v2/meta/system.json/version'
+        def apiVersion = json.version
         LOG.debug "apiVersion: $apiVersion"
         assert 'v2' == apiVersion
     }
 
     @Test
-    void testListApplications() {
-        def applications = api.listApplications()
+    void testListDnsApplications() {
+        def applications = api.get '/v2/reporting/applications/dns.json'
 
-        LOG.debug "applications: $applications.size"
+        LOG.debug "dns applications: $applications.size"
+        applications.each { LOG.debug "$it" }
+
+        assert !applications.isEmpty()
+
+        def application = applications[0]
+        assert Integer.valueOf(application.id) != null
+        assert application.name != null
+    }
+
+    @Test
+    void testListHttpApplications() {
+        def applications = api.get '/v2/config/applications/http.json'
+
+        LOG.debug "http applications: $applications.size"
         applications.each { LOG.debug "$it" }
 
         assert !applications.isEmpty()
@@ -66,7 +91,7 @@ class CedexisApiTest {
 
     @Test
     void testListContinents() {
-        def continents = api.listContinents()
+        def continents = api.get '/v2/reporting/continents.json'
 
         LOG.debug "continents: $continents.size"
         continents.each { LOG.debug "$it" }
@@ -83,7 +108,7 @@ class CedexisApiTest {
 
     @Test
     void testListSubcontinents() {
-        def subcontinents = api.listSubcontinents()
+        def subcontinents = api.get '/v2/reporting/subcontinents.json'
 
         LOG.debug "subcontinents: $subcontinents.size"
         subcontinents.each { LOG.debug "$it" }
@@ -97,23 +122,22 @@ class CedexisApiTest {
 
     @Test
     void testListCountries() {
-        def countries = api.listCountries()
+        def countries = api.get '/v2/reporting/countries.json'
 
-        LOG.debug "countries: $countries.size"
-        countries.each { LOG.debug "$it" }
+        printAll countries
 
-        assert countries.size() > 100
+        assert countries.size() > 200
 
         def france = countries.find { it.name == 'France' }
-        assert 'FR' == france.code
+        assert 'FR' == france.isoCode
         assert 'France' == france.name
-        assert 'Western Europe' == france.subcontinentName
-        assert 'Europe' == france.continentName
+        assert 'Western Europe' == france.subcontinent.name
+        assert 'Europe' == france.subcontinent.continent.name
     }
 
     @Test
     void testListCustomers() {
-        def customers = api.listCustomers()
+        def customers = api.get '/v2/reporting/customers.json'
 
         LOG.debug "customers: $customers.size"
         customers.each { LOG.debug "$it" }
@@ -123,7 +147,7 @@ class CedexisApiTest {
 
     @Test
     void testListNetworks() {
-        def networks = api.listNetworks('comcast')
+        def networks = api.get '/v2/reporting/networks.json', [q: 'comcast']
 
         LOG.debug "networks: $networks.size"
         networks.each { LOG.debug "$it" }
@@ -134,7 +158,7 @@ class CedexisApiTest {
 
     @Test
     void testListProbeTypes() {
-        def probeTypes = api.listProbeTypes()
+        def probeTypes = api.get '/v2/reporting/probetypes.json'
 
         LOG.debug "probe types: $probeTypes.size"
         probeTypes.each { LOG.debug "$it" }
@@ -152,7 +176,7 @@ class CedexisApiTest {
     void testListProbeTypesIsFrenchLocaleAware() {
         api.acceptLanguage = 'fr'
 
-        def probeTypes = api.listProbeTypes()
+        def probeTypes = api.get '/v2/reporting/probetypes.json'
 
         def availability = probeTypes.find { it.id == 3 }
         assert 3 == availability.id
@@ -165,7 +189,7 @@ class CedexisApiTest {
     void testListProbeTypesUsesEnglishForUnsupportedLocale() {
         api.acceptLanguage = 'cr' // Croation
 
-        def probeTypes = api.listProbeTypes()
+        def probeTypes = api.get '/v2/reporting/probetypes.json'
 
         def availability = probeTypes.find { it.name == 'Availability' }
         assert 3 == availability.id
@@ -176,22 +200,23 @@ class CedexisApiTest {
 
     @Test
     void testListUserAgents() {
-        def userAgents = api.listUserAgents(null)
+        def userAgents = api.get '/v2/reporting/useragents.json', [q: null]
 
         LOG.debug "userAgents: $userAgents.size"
         userAgents.each { LOG.debug "$it" }
 
         assert userAgents.size() > 150
 
-        assert userAgents.find { it.agentName == 'Internet Explorer' }
-        assert userAgents.find { it.agentName == 'Chrome' }
-        assert userAgents.find { it.os == 'Windows' }
-        assert userAgents.find { it.majorVersion == '22' }
+        assert userAgents.find { it.browserFamily.name == 'MSIE' }
+        assert userAgents.find { it.browserFamily.name == 'Chrome' }
+        assert userAgents.find { it.os.name == 'Windows' }
+        assert userAgents.find { it.majorVersion.name == '22' }
     }
 
     @Test
+    @Ignore("user agent searching is not currently supported")
     void testListUserAgentsWithSearch() {
-        def userAgents = api.listUserAgents('chrome')
+        def userAgents = api.get '/v2/reporting/useragents.json', [q: 'chrome']
 
         LOG.debug "userAgents: $userAgents.size"
         userAgents.each { LOG.debug "$it" }
@@ -199,7 +224,7 @@ class CedexisApiTest {
         assert 40 < userAgents.size()
         assert 60 > userAgents.size()
 
-        assert !userAgents.find { it.agentName == 'Internet Explorer' }
+        assert !userAgents.find { it.agentName == 'IE' }
         assert userAgents.find { it.agentName == 'Chrome' }
         assert userAgents.find { it.os == 'Windows' }
         assert userAgents.find { it.majorVersion == '22' }
@@ -208,12 +233,12 @@ class CedexisApiTest {
 
     @Test
     void testListStatistics() {
-        def statistics = api.listStatistics()
+        def statistics = api.get '/v2/reporting/statistics.json'
 
         LOG.debug "statistics: $statistics.size"
         statistics.each { LOG.debug "$it" }
 
-        assert 8 == statistics.size()
+        assert 9 == statistics.size()
 
         def measurements = statistics.find { it.name == 'measurements' }
         assert 'measurements' == measurements.name
@@ -221,181 +246,80 @@ class CedexisApiTest {
     }
 
     @Test
-    void testListProviders() {
+    void testListPlatforms() {
         //
-        // just community providers
-        def communityProviders = api.listProviders('COMMUNITY')
+        // just community platforms
+        def communityPlatforms = api.get '/v2/reporting/platforms.json/community'
 
-        LOG.debug "community providers: $communityProviders.size"
-        communityProviders.each { LOG.debug "$it" }
+        LOG.debug "community platforms: $communityPlatforms.size"
+        communityPlatforms.each { LOG.debug "$it" }
 
-        assert communityProviders.size() > 50
-        assert communityProviders.findAll { it.name.startsWith('Amazon') }.size() > 5
-        communityProviders.each {
-            assert it.visibility == 'COMMUNITY'
-            assert it.aliasedCommunityProviderId == null
+        assert communityPlatforms.size() > 50
+        assert communityPlatforms.findAll { it.name.startsWith('Amazon') }.size() > 5
+        communityPlatforms.each {
+            assert it.visibility == 'community'
+            assert it.aliasedCommunityPlatformId == null
         }
 
         //
-        // just private providers
-        def privateProviders = api.listProviders('PRIVATE')
+        // just private platforms
+        def privatePlatforms = api.get '/v2/reporting/platforms.json/private'
 
-        LOG.debug "private providers: $privateProviders.size"
-        privateProviders.each { LOG.debug "$it" }
-        assert privateProviders
-        privateProviders.each {
-            assert it.visibility == 'PRIVATE'
-            assert it.aliasedCommunityProviderId != null
+        LOG.debug "private platforms: $privatePlatforms.size"
+        privatePlatforms.each { LOG.debug "$it" }
+        assert privatePlatforms
+        privatePlatforms.each {
+            assert it.visibility == 'private'
         }
 
         //
-        // community and private providers
-        def allProviders = api.listProviders(null)
+        // community and private platforms
+        def allPlatforms = api.get '/v2/reporting/platforms.json'
 
-        LOG.debug "all providers: $allProviders.size"
-        allProviders.each { LOG.debug "$it" }
-        assert allProviders.size() == communityProviders.size() + privateProviders.size()
+        LOG.debug "all platforms: $allPlatforms.size"
+        allPlatforms.each { LOG.debug "$it" }
+        assert allPlatforms.size() == communityPlatforms.size() + privatePlatforms.size()
     }
 
     @Test
-    void testListAddAndLoadReferrers() {
+    void testListAddAndLoadReferers() {
         //
-        // add a referrer
-        def referrers = api.listReferrers()
-        def preAddReferrerCount = referrers.size()
+        // add a referer
+        def referers = api.get '/v2/reporting/referers.json'
+        def preAddRefererCount = referers.size()
 
-        def url = 'http://www.test.com/' + UUID.randomUUID().toString()
-        def addedReferrer = api.addReferrer url
+        def url = 'www.test.com/' + UUID.randomUUID().toString()
+        def addedReferer = api.post '/v2/config/referers.json', [url: url]
 
-        LOG.debug "added referrer: $addedReferrer"
-
-        //
-        // list referrers
-        referrers = api.listReferrers()
-
-        LOG.debug "referrers: $referrers.size"
-        referrers.each { LOG.debug "$it" }
-
-        assert 1 + preAddReferrerCount == referrers.size()
-        assert referrers.find { it.url.startsWith('http://www.test.com/') }
-
-        assert url == addedReferrer.url
-        assert addedReferrer.id
+        LOG.debug "added referer: $addedReferer"
 
         //
-        // load a referrer
-        def loadedReferrer = api.loadReferrer addedReferrer.id
-        assert loadedReferrer.id == addedReferrer.id
-        assert loadedReferrer.url == addedReferrer.url
+        // list referers
+        referers = api.get '/v2/reporting/referers.json'
+
+        LOG.debug "referers: $referers.size"
+        referers.each { LOG.debug "$it" }
+
+        assert 1 + preAddRefererCount == referers.size()
+        assert referers.find { it.url.startsWith('www.test.com/') }
+
+        assert url == addedReferer.url
+        assert addedReferer.id
+
+        //
+        // load a referer
+        def loadedReferer = api.get '/v2/config/referers.json/' + addedReferer.id
+        assert loadedReferer.id == addedReferer.id
+        assert loadedReferer.url == addedReferer.url
     }
 
     @Test
-    void testLoadReferrerNotFound() {
+    void testLoadRefererNotFound() {
         try {
-            api.loadReferrer(-1)
+            api.get '/v2/config/referers.json/' + -1
         } catch (ApiException e) {
-            assert 404 == e.httpStatus
+            assert 404 == e.errorResponse.httpStatus
         }
     }
 
-    @Test
-    void testQueryRadarTrafficByCountry() {
-        // View Radar measurement traffic from your visitors and the community as a whole.
-//        =================================
-//        :Total Radar Measurements #1
-//x         inputClass=radar
-//x         measurementSource=customer
-//x         probeTypeId=21
-//x         timeRange=1363824000%2F1364428800
-//        group0Order=desc
-//        group0Sort=measurements
-//        group1Fact=measurements
-//        group=countryId%2CtimeRange
-        try {
-            api.queryRadarFacts(
-                    probeTypeIds: '21',
-                    timeRange: 'last_5_hours',
-                    // does this need to change to "customer"? here or lower in my aggapi impl?
-                    measurementSource: 'myvisitors',
-                    group: 'countryId,timeRange',
-                    // where is group0Fact???
-                    group0Sort: 'measurements',
-                    group0Order: 'desc',
-                    group1Fact: 'measurements'
-            )
-        } catch (ApiException e) {
-            assert 500 == e.httpStatus
-        }
-//
-//
-//        =================================
-//        :Total Radar Measurements #2
-//x         inputClass=radar
-//        measurementSource=customer
-//        overallFact=measurements
-//        probeTypeId=21
-//        timeRange=1363824000%2F1364428800
-//        group0Count=true
-//        group0Fact=measurements
-//        group0Limit=10
-//        group0Offset=0
-//        group0Order=desc
-//        group0Sort=measurements
-//        group=countryId
-//        try {
-
-//            api.queryRadarFacts(
-//                    probeTypeIds: '1,2,3',
-//                    providerIds: '1,2,3',
-//                    countryIds: '1,2,3',
-//                    networkIds: '1,2,3',
-//                    timeRange: 'last_3_days',
-//                    measurementSource: 'myvisitors',
-//                    geoLocateUsing: 'client'
-//            )
-//        } catch (ApiException e) {
-//            assert 500 == e.httpStatus
-//        }
-    }
-
-//    @Test
-//    void testQueryRadarTrafficInACountry() {
-//        // How many Radar measurements are being generated in a country, network-by-network?
-//
-//    }
-//
-//    @Test
-//    void testQueryRadarPerformanceByPlatform() {
-//        // How do platforms compare for a selected data set?
-//    }
-//
-//    @Test
-//    void testQueryRadarVarianceByPlatform() {
-//        // How does platform variance compare by platform?
-//    }
-//
-//    @Test
-//    void testQueryRadarPerformanceByCountryForAPlatform() {
-//        // How does a single platform compare around the world, country-by-country?
-//    }
-//
-//    @Test
-//    void testQueryRadarVarianceByCountryForAPlatform() {
-//        // How does platform variance compare by country fo ra single platform?
-//    }
-//
-//    @Test
-//    void testQueryPageLoadTimeByCountry() {
-//        // Compare total and partial page load times for your visitors around the world.
-//    }
-//
-//    @Test
-//    void testQueryPageLoadTimeInACountry() {
-//        // Compare total and partial page load times for your visitors across networks for individual countries.
-//    }
-//
-//    @Test
-//    void testQueryPageLoadTimeVariance() {
-//        // Explore the variability in total and partial page load times for your visitors.
-//    }
 }

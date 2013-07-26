@@ -30,7 +30,8 @@ class Main {
             new Commands.WelcomeCommand(),
             new Commands.ExitCommand(),
             new Commands.PingCommand(),
-            new Commands.ListApplicationsCommand(),
+            new Commands.ListDnsApplicationsCommand(),
+            new Commands.ListHttpApplicationsCommand(),
             new Commands.ListContinentsCommand(),
             new Commands.ListSubcontinentsCommand(),
             new Commands.ListCountriesCommand(),
@@ -38,10 +39,10 @@ class Main {
             new Commands.ListProbeTypesCommand(),
             new Commands.SearchUserAgentsCommand(),
             new Commands.ListStatisticsCommand(),
-            new Commands.SearchProvidersCommand(),
+            new Commands.SearchPlatformsCommand(),
             new Commands.SearchNetworksCommand(),
-            new Commands.ListReferrersCommand(),
-            new Commands.AddAReferrerCommand()
+            new Commands.ListReferersCommand(),
+            new Commands.AddARefererCommand()
     ]
 
     // -------------------------------------------------------------------------
