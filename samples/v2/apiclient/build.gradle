@@ -1,4 +1,4 @@
-description = 'Cedexis API Client'
+description = 'Cedexis API Client written in Groovy'
 
 apply plugin: 'application'
 mainClassName = 'com.cedexis.api.v2.sampleclient.cli.Main'
