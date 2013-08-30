@@ -10,23 +10,6 @@ plugins.withType(MavenPlugin) {
      * Publish to your local repo: gradle install
      * Publish to remote repo: see scripts/publish.sh
      */
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-
-                //
-                // The cedexisMaven* variables come from your ~/.gradle/gradle.properties
-                //
-
-                repository(url: cedexisMavenPublicReleases) {
-                    authentication(userName: cedexisMavenUser, password: cedexisMavenPassword)
-                }
-                snapshotRepository(url: cedexisMavenPublicSnapshots) {
-                    authentication(userName: cedexisMavenUser, password: cedexisMavenPassword)
-                }
-            }
-        }
-    }
 
     // PUBLISHES SRC AND JAVADOC TO MAVEN
     task sourceJar(type: Jar, dependsOn: classes) {
