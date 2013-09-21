@@ -56,8 +56,8 @@ final class Commands {
 
         @Override
         void doProcess(CedexisApi api) {
-            LOG.info 'Ping: ' + api.get('/v2/meta/system.json/ping').ping
-            LOG.info 'API version: ' + api.get('/v2/meta/system.json/version').version
+            LOG.info 'Ping: ' + api.get('/v2/meta/system.json/ping').json.result
+            LOG.info 'API version: ' + api.get('/v2/meta/system.json/version').json.result
         }
     }
 
@@ -66,7 +66,7 @@ final class Commands {
         String name() { 'List DNS Applications' }
 
         @Override
-        void doProcess(CedexisApi api) { api.get('/v2/reporting/applications/dns.json').each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/applications/dns.json').json.each { LOG.info "$it" } }
     }
 
     static class ListHttpApplicationsCommand extends AbstractCommand {
@@ -74,7 +74,7 @@ final class Commands {
         String name() { 'List HTTP Applications' }
 
         @Override
-        void doProcess(CedexisApi api) { api.get('/v2/config/applications/http.json').each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/config/applications/http.json').json.each { LOG.info "$it" } }
     }
 
     static class ListContinentsCommand extends AbstractCommand {
@@ -82,7 +82,7 @@ final class Commands {
         String name() { 'List Continents' }
 
         @Override
-        void doProcess(CedexisApi api) { api.get('/v2/reporting/continents.json').each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/continents.json').json.each { LOG.info "$it" } }
     }
 
     static class ListSubcontinentsCommand extends AbstractCommand {
@@ -90,7 +90,7 @@ final class Commands {
         String name() { 'List Subcontinents' }
 
         @Override
-        void doProcess(CedexisApi api) { api.get('/v2/reporting/subcontinents.json').each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/subcontinents.json').json.each { LOG.info "$it" } }
     }
 
     static class ListCountriesCommand extends AbstractCommand {
@@ -98,7 +98,7 @@ final class Commands {
         String name() { 'List Countries' }
 
         @Override
-        void doProcess(CedexisApi api) { api.get('/v2/reporting/countries.json').each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/countries.json').json.each { LOG.info "$it" } }
     }
 
     static class ListCustomersCommand extends AbstractCommand {
@@ -106,7 +106,7 @@ final class Commands {
         String name() { 'List Customers' }
 
         @Override
-        void doProcess(CedexisApi api) { api.get('/v2/reporting/customers.json').each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/customers.json').json.each { LOG.info "$it" } }
     }
 
     static class ListProbeTypesCommand extends AbstractCommand {
@@ -114,7 +114,7 @@ final class Commands {
         String name() { 'List Probe Types' }
 
         @Override
-        void doProcess(CedexisApi api) { api.get('/v2/reporting/probetypes.json').each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/probetypes.json').json.each { LOG.info "$it" } }
     }
 
     static class SearchUserAgentsCommand extends AbstractCommand {
@@ -122,7 +122,7 @@ final class Commands {
         String name() { 'List User Agents' }
 
         @Override
-        void doProcess(CedexisApi api) { api.get('/v2/reporting/useragents.json').each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/useragents.json').json.each { LOG.info "$it" } }
     }
 
     static class ListStatisticsCommand extends AbstractCommand {
@@ -130,7 +130,7 @@ final class Commands {
         String name() { 'List Statistics' }
 
         @Override
-        void doProcess(CedexisApi api) { api.get('/v2/reporting/statistics.json').each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/statistics.json').json.each { LOG.info "$it" } }
     }
 
     static class SearchPlatformsCommand extends AbstractCommand {
@@ -141,7 +141,7 @@ final class Commands {
         void doProcess(CedexisApi api) {
             def q = readStdIn 'Enter "community" or "private"'
             LOG.info "Searching for $q platforms..."
-            def platforms = api.get("/v2/reporting/platforms.json/$q")
+            def platforms = api.get("/v2/reporting/platforms.json/$q").json
             platforms.each { LOG.info "$it" }
             LOG.info "$platforms.size platforms found"
         }
@@ -155,7 +155,7 @@ final class Commands {
         void doProcess(CedexisApi api) {
             def q = readStdIn 'Enter network name'
             LOG.info "Searcing for networks named like [$q]..."
-            def networks = api.get('/v2/reporting/networks.json', [q: q])
+            def networks = api.get('/v2/reporting/networks.json', [q: q]).json
             networks.each { LOG.info "$it" }
             LOG.info "$networks.size networks found"
         }
@@ -166,7 +166,7 @@ final class Commands {
         String name() { 'List Referers' }
 
         @Override
-        void doProcess(CedexisApi api) { api.get('/v2/reporting/referers.json').each { LOG.info "$it" } }
+        void doProcess(CedexisApi api) { api.get('/v2/reporting/referers.json').json.each { LOG.info "$it" } }
     }
 
     static class AddARefererCommand extends AbstractCommand {
@@ -177,7 +177,7 @@ final class Commands {
         void doProcess(CedexisApi api) {
             def q = readStdIn 'Enter a URL'
             LOG.info "Adding '[$q]' as a referer..."
-            def added = api.post('/v2/config/referers.json', [url: q])
+            def added = api.post('/v2/config/referers.json', [url: q]).json
             LOG.info "Added $added"
         }
     }

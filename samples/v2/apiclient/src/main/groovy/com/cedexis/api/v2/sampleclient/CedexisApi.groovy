@@ -69,7 +69,7 @@ class CedexisApi {
     def get(path, query = [:]) throws ApiException {
         restClient.get(path: p(path), query: query, contentType: JSON,
                 headers: headers()) { resp, json ->
-            json
+            [response: resp, 'json': json]
         }
     }
 
@@ -78,7 +78,7 @@ class CedexisApi {
     def post(path, body = [:]) throws ApiException {
         restClient.post(path: p(path), body: body, contentType: JSON,
                 requestContentType: JSON, headers: headers()) { resp, json ->
-            json
+            [response: resp, 'json': json]
         }
     }
 
@@ -87,7 +87,7 @@ class CedexisApi {
     def put(path, body = [:]) throws ApiException {
         restClient.put(path: p(path), body: body, contentType: JSON,
                 requestContentType: JSON, headers: headers()) { resp, json ->
-            json
+            [response: resp, 'json': json]
         }
     }
 
@@ -96,7 +96,7 @@ class CedexisApi {
     def delete(path, body = [:]) throws ApiException {
         restClient.delete(path: p(path), body: body, contentType: JSON,
                 requestContentType: JSON, headers: headers()) { resp, json ->
-            json
+            [response: resp, 'json': json]
         }
     }
 
