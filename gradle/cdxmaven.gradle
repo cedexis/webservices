@@ -8,7 +8,7 @@ plugins.withType(MavenPlugin) {
      * (http://www.gradle.org/docs/current/userguide/maven_plugin.html).
      *
      * Publish to your local repo: gradle install
-     * Publish to remote repo: see scripts/publish.sh
+     * Publish to remote repo: gradle uploadArchives
      */
 
     // PUBLISHES SRC AND JAVADOC TO MAVEN
