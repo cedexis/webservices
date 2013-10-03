@@ -253,7 +253,7 @@ class CedexisApiTest {
         communityPlatforms.each { LOG.debug "$it" }
 
         assert communityPlatforms.size() > 50
-        assert communityPlatforms.findAll { it.name.startsWith('Amazon') }.size() > 5
+        assert communityPlatforms.findAll { it.name.startsWith('AWS') }.size() > 5
         communityPlatforms.each {
             assert it.visibility == 'community'
             assert it.aliasedCommunityPlatformId == null
