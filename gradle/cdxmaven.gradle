@@ -1,5 +1,5 @@
 /**
- * Configure Maven publishing for all projects that have the "maven" plugin applied...
+ * Configure Maven publishing for all projecs that have the "maven" plugin applied...
  */
 plugins.withType(MavenPlugin) {
 
@@ -8,7 +8,7 @@ plugins.withType(MavenPlugin) {
      * (http://www.gradle.org/docs/current/userguide/maven_plugin.html).
      *
      * Publish to your local repo: gradle install
-     * Publish to remote repo: see scripts/publish.sh
+     * Publish to remote repo: gradle uploadArchives
      */
     uploadArchives {
         repositories {

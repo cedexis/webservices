@@ -48,22 +48,23 @@ class CedexisApiTest {
 
     @Test
     void testPing() {
-        def json = api.get '/v2/meta/system.json/ping'
-        LOG.debug "ping response: $json.ping"
-        assert 'pong' == json.ping
+        def got = api.get '/v2/meta/system.json/ping'
+        assert 200 == got.response.status
+        LOG.debug "ping response: $got.json.result"
+        assert 'pong' == got.json.result
     }
 
     @Test
     void testApiVersion() {
-        def json = api.get '/v2/meta/system.json/version'
-        def apiVersion = json.version
+        def got = api.get '/v2/meta/system.json/version'
+        def apiVersion = got.json.result
         LOG.debug "apiVersion: $apiVersion"
         assert 'v2' == apiVersion
     }
 
     @Test
     void testListDnsApplications() {
-        def applications = api.get '/v2/reporting/applications/dns.json'
+        def applications = api.get('/v2/reporting/applications/dns.json').json
 
         LOG.debug "dns applications: $applications.size"
         applications.each { LOG.debug "$it" }
@@ -77,7 +78,7 @@ class CedexisApiTest {
 
     @Test
     void testListHttpApplications() {
-        def applications = api.get '/v2/config/applications/http.json'
+        def applications = api.get('/v2/config/applications/http.json').json
 
         LOG.debug "http applications: $applications.size"
         applications.each { LOG.debug "$it" }
@@ -91,7 +92,7 @@ class CedexisApiTest {
 
     @Test
     void testListContinents() {
-        def continents = api.get '/v2/reporting/continents.json'
+        def continents = api.get('/v2/reporting/continents.json').json
 
         LOG.debug "continents: $continents.size"
         continents.each { LOG.debug "$it" }
@@ -108,7 +109,7 @@ class CedexisApiTest {
 
     @Test
     void testListSubcontinents() {
-        def subcontinents = api.get '/v2/reporting/subcontinents.json'
+        def subcontinents = api.get('/v2/reporting/subcontinents.json').json
 
         LOG.debug "subcontinents: $subcontinents.size"
         subcontinents.each { LOG.debug "$it" }
@@ -122,7 +123,7 @@ class CedexisApiTest {
 
     @Test
     void testListCountries() {
-        def countries = api.get '/v2/reporting/countries.json'
+        def countries = api.get('/v2/reporting/countries.json').json
 
         printAll countries
 
@@ -137,7 +138,7 @@ class CedexisApiTest {
 
     @Test
     void testListCustomers() {
-        def customers = api.get '/v2/reporting/customers.json'
+        def customers = api.get('/v2/reporting/customers.json').json
 
         LOG.debug "customers: $customers.size"
         customers.each { LOG.debug "$it" }
@@ -147,7 +148,7 @@ class CedexisApiTest {
 
     @Test
     void testListNetworks() {
-        def networks = api.get '/v2/reporting/networks.json', [q: 'comcast']
+        def networks = api.get('/v2/reporting/networks.json', [q: 'comcast']).json
 
         LOG.debug "networks: $networks.size"
         networks.each { LOG.debug "$it" }
@@ -158,7 +159,7 @@ class CedexisApiTest {
 
     @Test
     void testListProbeTypes() {
-        def probeTypes = api.get '/v2/reporting/probetypes.json'
+        def probeTypes = api.get('/v2/reporting/probetypes.json').json
 
         LOG.debug "probe types: $probeTypes.size"
         probeTypes.each { LOG.debug "$it" }
@@ -173,23 +174,10 @@ class CedexisApiTest {
     }
 
     @Test
-    void testListProbeTypesIsFrenchLocaleAware() {
-        api.acceptLanguage = 'fr'
-
-        def probeTypes = api.get '/v2/reporting/probetypes.json'
-
-        def availability = probeTypes.find { it.id == 3 }
-        assert 3 == availability.id
-        assert 'Disponibilité' == availability.name
-        assert 'AVAIL' == availability.measurement
-        assert 'HTTP' == availability.protocol
-    }
-
-    @Test
     void testListProbeTypesUsesEnglishForUnsupportedLocale() {
         api.acceptLanguage = 'cr' // Croation
 
-        def probeTypes = api.get '/v2/reporting/probetypes.json'
+        def probeTypes = api.get('/v2/reporting/probetypes.json').json
 
         def availability = probeTypes.find { it.name == 'Availability' }
         assert 3 == availability.id
@@ -200,7 +188,7 @@ class CedexisApiTest {
 
     @Test
     void testListUserAgents() {
-        def userAgents = api.get '/v2/reporting/useragents.json', [q: null]
+        def userAgents = api.get('/v2/reporting/useragents.json', [q: null]).json
 
         LOG.debug "userAgents: $userAgents.size"
         userAgents.each { LOG.debug "$it" }
@@ -216,7 +204,7 @@ class CedexisApiTest {
     @Test
     @Ignore("user agent searching is not currently supported")
     void testListUserAgentsWithSearch() {
-        def userAgents = api.get '/v2/reporting/useragents.json', [q: 'chrome']
+        def userAgents = api.get('/v2/reporting/useragents.json', [q: 'chrome']).json
 
         LOG.debug "userAgents: $userAgents.size"
         userAgents.each { LOG.debug "$it" }
@@ -233,7 +221,7 @@ class CedexisApiTest {
 
     @Test
     void testListStatistics() {
-        def statistics = api.get '/v2/reporting/statistics.json'
+        def statistics = api.get('/v2/reporting/statistics.json').json
 
         LOG.debug "statistics: $statistics.size"
         statistics.each { LOG.debug "$it" }
@@ -246,10 +234,20 @@ class CedexisApiTest {
     }
 
     @Test
+    void testListStatisticsIsFrenchLocaleAware() {
+        api.acceptLanguage = 'fr'
+
+        def statistics = api.get('/v2/reporting/statistics.json').json
+
+        def measurements = statistics.find { it.name == 'measurements' }
+        assert 'Mesures' == measurements.description
+    }
+
+    @Test
     void testListPlatforms() {
         //
         // just community platforms
-        def communityPlatforms = api.get '/v2/reporting/platforms.json/community'
+        def communityPlatforms = api.get('/v2/reporting/platforms.json/community').json
 
         LOG.debug "community platforms: $communityPlatforms.size"
         communityPlatforms.each { LOG.debug "$it" }
@@ -263,7 +261,7 @@ class CedexisApiTest {
 
         //
         // just private platforms
-        def privatePlatforms = api.get '/v2/reporting/platforms.json/private'
+        def privatePlatforms = api.get('/v2/reporting/platforms.json/private').json
 
         LOG.debug "private platforms: $privatePlatforms.size"
         privatePlatforms.each { LOG.debug "$it" }
@@ -274,7 +272,7 @@ class CedexisApiTest {
 
         //
         // community and private platforms
-        def allPlatforms = api.get '/v2/reporting/platforms.json'
+        def allPlatforms = api.get('/v2/reporting/platforms.json').json
 
         LOG.debug "all platforms: $allPlatforms.size"
         allPlatforms.each { LOG.debug "$it" }
@@ -285,17 +283,17 @@ class CedexisApiTest {
     void testListAddAndLoadReferers() {
         //
         // add a referer
-        def referers = api.get '/v2/reporting/referers.json'
+        def referers = api.get('/v2/reporting/referers.json').json
         def preAddRefererCount = referers.size()
 
         def url = 'www.test.com/' + UUID.randomUUID().toString()
-        def addedReferer = api.post '/v2/config/referers.json', [url: url]
+        def addedReferer = api.post('/v2/config/referers.json', [url: url]).json
 
         LOG.debug "added referer: $addedReferer"
 
         //
         // list referers
-        referers = api.get '/v2/reporting/referers.json'
+        referers = api.get('/v2/reporting/referers.json').json
 
         LOG.debug "referers: $referers.size"
         referers.each { LOG.debug "$it" }
@@ -308,7 +306,7 @@ class CedexisApiTest {
 
         //
         // load a referer
-        def loadedReferer = api.get '/v2/config/referers.json/' + addedReferer.id
+        def loadedReferer = api.get('/v2/config/referers.json/' + addedReferer.id).json
         assert loadedReferer.id == addedReferer.id
         assert loadedReferer.url == addedReferer.url
     }

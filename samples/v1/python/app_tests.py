@@ -1,5 +1,5 @@
-#!/usr/bin/python
-from OAuthApiTest import OAuthApiTest 
+#!/usr/bin/env python
+from OAuthApiTest import OAuthApiTest, encode_multipart_formdata
 
 apiTest = OAuthApiTest("OAuth Application Tests")
 
@@ -16,8 +16,9 @@ fields = [("displayName","web services test"),
 files = [("data", 
          "ws_test.php", 
          """<?php
-function process_request($Cedexis) {
-    return "radar.cedexis.com,cotendo";
+class OpenmixApplication implements Lifecycle {
+    public function init($config) {}
+    public function service($request,$response,$utilities) {}
 }
 ?>""")]
 
