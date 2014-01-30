@@ -4,7 +4,7 @@ apply plugin: 'application'
 mainClassName = 'com.cedexis.api.v2.sampleclient.cli.Main'
 
 apply plugin: 'maven'
-apply from: "$rootDir/gradle/cdxmaven.gradle"
+//apply from: "$rootDir/gradle/cdxmaven.gradle"
 
 dependencies {
     compile('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
